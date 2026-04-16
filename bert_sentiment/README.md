@@ -4,6 +4,18 @@ Fine-tuning a pre-trained Transformer model (DistilBERT) to classify movie revie
 
 ---
 
+## Two Implementations
+
+| | Notebook | Production (`src/`) |
+|---|---|---|
+| **Location** | `notebook/bert_sentiment.ipynb` | `src/` + `cli.py` |
+| **Purpose** | Learn and experiment step-by-step | Inference on new text, ready to deploy |
+| **Runs** | Jupyter | `python3 cli.py predict "..."` |
+| **Includes** | Training, evaluation, visualisation | Predictor class, pipeline, CLI, pytest tests |
+| **When to use** | Understand the model or retrain | Run predictions without touching the notebook |
+
+---
+
 ## What This Project Does
 
 Given a movie review like:
@@ -64,6 +76,67 @@ Achieved **89% accuracy using only 2,000 training examples** — demonstrating t
 
 ---
 
+## Project Structure
+
+```
+bert_sentiment/
+├── notebook/
+│   └── bert_sentiment.ipynb     # End-to-end training notebook (10 steps)
+├── src/
+│   ├── config.py                # Pydantic-settings config (model dir, device, batch size)
+│   ├── predictor.py             # Predictor class — loads model, predict / predict_batch
+│   └── pipeline.py             # Public API — lazy singleton, predict_sentiment, batch_predict
+├── tests/
+│   ├── conftest.py              # Shared fixtures (mock model, tokenizer, predictor)
+│   ├── test_predictor.py        # Unit tests for Predictor class
+│   └── test_pipeline.py        # Unit tests for pipeline functions
+├── cli.py                       # Click CLI — predict, batch, info commands
+├── requirements.txt
+├── bert_sentiment_model/        # Saved fine-tuned model (safetensors)
+└── training_curves.png          # Loss and accuracy plots
+```
+
+---
+
+## Quick Start
+
+**1. Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+**2. Predict sentiment for a single review**
+```bash
+python3 cli.py predict "This movie was absolutely fantastic!"
+```
+```
+Text      : This movie was absolutely fantastic!
+Sentiment : POSITIVE
+Confidence: 98.2%
+```
+
+**3. Batch predict from a file** (one review per line)
+```bash
+python3 cli.py batch --file reviews.txt
+```
+
+**4. Show model info**
+```bash
+python3 cli.py info
+```
+
+**5. Run the notebook** (training from scratch)
+```bash
+jupyter notebook notebook/bert_sentiment.ipynb
+```
+
+**6. Run tests**
+```bash
+python3 -m pytest tests/ -v
+```
+
+---
+
 ## How It Works
 
 ```
@@ -82,60 +155,15 @@ Label + Confidence score
 
 ---
 
-## Project Structure
-
-```
-bert_sentiment/
-├── bert_sentiment.ipynb     # Main notebook — run this
-├── bert_sentiment_model/    # Saved model after training (generated)
-├── training_curves.png      # Loss and accuracy plots (generated)
-└── README.md
-```
-
----
-
-## How to Run
-
-**1. Install dependencies**
-```bash
-pip install torch transformers datasets scikit-learn matplotlib accelerate
-```
-
-**2. Open the notebook**
-```bash
-jupyter notebook bert_sentiment.ipynb
-```
-
-**3. Run all cells top to bottom**
-
-No API key needed. The IMDb dataset and DistilBERT model are downloaded automatically from Hugging Face (free).
-
----
-
-## Notebook Steps
-
-| Step | What it does |
-|---|---|
-| 1 | Load IMDb dataset |
-| 2 | Tokenize reviews into BERT token IDs |
-| 3 | Load pre-trained DistilBERT + classification head |
-| 4 | Define accuracy and F1 evaluation metrics |
-| 5 | Configure training (epochs, batch size, learning rate) |
-| 6 | Fine-tune the model for 3 epochs |
-| 7 | Evaluate — accuracy, F1, classification report, training curves |
-| 8 | Save the fine-tuned model to disk |
-| 9 | Run inference on custom reviews |
-| 10 | Production considerations for serving at scale |
-
----
-
 ## Tech Stack
 
-- [PyTorch](https://pytorch.org/) — neural network training
+- [PyTorch](https://pytorch.org/) — neural network training and inference
 - [Hugging Face Transformers](https://huggingface.co/docs/transformers) — DistilBERT model and tokenizer
 - [Hugging Face Datasets](https://huggingface.co/docs/datasets) — IMDb dataset
-- [scikit-learn](https://scikit-learn.org/) — evaluation metrics
-- [Matplotlib](https://matplotlib.org/) — training curve visualisation
+- [scikit-learn](https://scikit-learn.org/) — evaluation metrics (notebook only)
+- [Matplotlib](https://matplotlib.org/) — training curve visualisation (notebook only)
+- [Click](https://click.palletsprojects.com/) — CLI
+- [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) — configuration
 
 ---
 

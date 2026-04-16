@@ -1,0 +1,11 @@
+# Model inference
+torch
+transformers
+
+# Production CLI + config
+click
+pydantic-settings
+
+# Testing
+pytest
+pytest-mock
