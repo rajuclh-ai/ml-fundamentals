@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+adapter/
+data/train.jsonl
+data/test.jsonl
+*.safetensors
+*.bin
