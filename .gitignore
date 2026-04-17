@@ -27,6 +27,11 @@ bert_sentiment/bert_sentiment_model/
 
 # Generated files
 bert_sentiment/training_curves.png
+bert_sentiment/notebook/bert_sentiment_model/
+bert_sentiment/notebook/training_curves.png
+
+# Claude internal
+.claude/
 
 # Environment
 .env
